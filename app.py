@@ -75,7 +75,19 @@ def plotView():
     fig.update_yaxes(title_text="New Cases", secondary_y=False)
     fig.update_yaxes(title_text="Total Cases", secondary_y=True)
 
-    # fig.savefig('./static/images/aus_new.png')
+    # fig.update_xaxes(
+    # rangeslider_visible=True,
+    #     rangeselector=dict(
+    #         buttons=list([
+    #             dict(count=1, label="1m", step="month", stepmode="backward"),
+    #             dict(count=6, label="6m", step="month", stepmode="backward"),
+    #             dict(count=1, label="YTD", step="year", stepmode="todate"),
+    #             dict(count=1, label="1y", step="year", stepmode="backward"),
+    #             dict(step="all")
+    #         ])
+    #     )
+    # )
+
     fig.write_html("./templates/file.html")
     # fig.write_html("./index.html")
 
