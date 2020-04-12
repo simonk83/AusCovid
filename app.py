@@ -82,3 +82,6 @@ def plotView():
 
    
     return render_template('file.html') #, url ='/static/images/aus_new.png')
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
