@@ -83,6 +83,7 @@ def plotView():
 
     # fig.savefig('./static/images/aus_new.png')
     fig.write_html("./templates/file.html")
+    fig.write_html("./index.html")
 
 
     # #Set graph options
