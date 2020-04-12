@@ -2,7 +2,6 @@ from flask import Flask
 from flask import render_template
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -13,8 +12,6 @@ app = Flask(__name__)
 def plotView():
 
     plt.switch_backend('Agg')
-
-    sns.set(rc={'figure.figsize':(22,8)})
 
     url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
 
@@ -55,9 +52,6 @@ def plotView():
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-    # fig = px.bar(aus_df, x='Date', y='New Cases')
-    # fig = go.Figure([go.bar(x=aus_df['Date'], y=aus_df['New Cases'])])
-
     # Add traces
     fig.add_trace(
         go.Bar(x=aus_df['Date'], y=aus_df['New Cases'], name="New Cases"),
@@ -83,45 +77,8 @@ def plotView():
 
     # fig.savefig('./static/images/aus_new.png')
     fig.write_html("./templates/file.html")
-    fig.write_html("./index.html")
+    # fig.write_html("./index.html")
 
 
-    # #Set graph options
-    # plt.style.use('seaborn-darkgrid')
-    # palette = plt.get_cmap('Set1')
-    # plt.figure(figsize=(20,10))
-        
-    # # #Plot the graph    
-    # # plt.plot(aus_df['index'], aus_df['Australia'], marker = '', color=palette(1), linewidth=1.9, alpha=0.9, label='Australia')
-
-    # # #Set the title
-    # # plt.title('Australia', loc='left', fontsize=12, fontweight=0, color=palette(1))
-
-    # # #Name the axis  
-    # # plt.text(16, -60, 'Date',horizontalalignment='center', verticalalignment='center')
-    # # plt.text(-2.4, 280, 'New Cases', horizontalalignment='center', verticalalignment='center', rotation='vertical')
-
-    # aus_df.set_index('Date', inplace=True)
-
-    # ax = aus_df[['New Cases']].plot(kind='bar', title ="Australia", figsize=(15, 10), legend=False)
-    # ax2 = aus_df['Australia'].plot(secondary_y=True)
-
-    # ax.set_xlabel("Date", fontsize=12)
-    # ax.set_ylabel("New Cases", fontsize=12)
-    # ax2.set_ylabel("Total Cases", fontsize=12)
-    # ax2.grid(False)
-    # ax.set_xticklabels(ax.get_xticklabels(),rotation=45)
-
-
-    # plt.savefig('./static/images/aus_new.png')
-
-    
-    # Convert plot to PNG image
-    # pngImage = io.BytesIO()
-    # FigureCanvas(plt).print_png(pngImage)
-    
-    # # Encode PNG image to base64 string
-    # pngImageB64String = "data:image/png;base64,"
-    # pngImageB64String += base64.b64encode(pngImage.getvalue()).decode('utf8')
-    
+   
     return render_template('file.html') #, url ='/static/images/aus_new.png')
