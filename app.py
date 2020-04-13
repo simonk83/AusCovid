@@ -24,8 +24,16 @@ def plotView():
     aus_df = df.loc[(df['Country/Region'] == 'Australia')]
 
     aus_dfc = dfc.loc[(dfc['Country_Region'] == 'Australia')]
-    aus_dfc = aus_dfc.drop(['Lat','Long_', 'Last_Update', 'People_Tested', 'People_Hospitalized', 'Mortality_Rate', 'UID', 'ISO3', 'Deaths', 'Recovered', 'Active', 'Incident_Rate'], axis=1)
+    aus_dfc = aus_dfc.drop(['Lat','Long_', 'People_Tested', 'People_Hospitalized', 'Mortality_Rate', 'UID', 'ISO3', 'Deaths', 'Recovered', 'Active', 'Incident_Rate'], axis=1)
     aus_dfc.rename(columns={'Country_Region':'Country/Region'}, inplace=True)
+
+    #Convert to date, assign to variable, drop column
+    aus_dfc['Last_Update'] = pd.to_datetime(aus_dfc['Last_Update'])
+    updatetime = aus_dfc['Last_Update'].dt.tz_localize('utc').dt.tz_convert('Australia/Melbourne')
+    updatetime = updatetime.dt.tz_localize(None)
+    updatetime = updatetime.values[0]
+    updatetime = pd.to_datetime(updatetime)
+    aus_dfc = aus_dfc.drop(['Last_Update'], axis=1)
 
     #Sum all states
     aus_df = aus_df.groupby(['Country/Region']).sum()
@@ -58,7 +66,7 @@ def plotView():
     aus_df['Date'] = pd.to_datetime(aus_df['Date'])
     
     #Set beginning of data
-    aus_df = aus_df[(aus_df['Date'] > '03-10-2020')]
+    aus_df = aus_df[(aus_df['Date'] > '02-29-2020')]
 
     #Format date
     aus_df['Date'] = aus_df['Date'].dt.strftime('%d/%m')
@@ -79,7 +87,7 @@ def plotView():
 
     # Add figure title
     fig.update_layout(
-    title_text="New and Overall Cases in Australia (data from Johns Hopkins, data now refreshes hourly)"
+    title_text="New and Overall Cases in Australia (data from Johns Hopkins, last updated {})".format(updatetime)
     )
 
     # Set x-axis title
