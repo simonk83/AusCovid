@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -53,8 +53,15 @@ def plotView():
     #Show the difference between days (new cases)
     aus_df['New Cases'] = aus_df['Australia'] - aus_df['Australia'].shift(1)
 
-    aus_df.rename({aus_df.index[-1]: datetime.date.today()}, inplace=True)
-    aus_df.index = pd.to_datetime(aus_df.index)
+    test = datetime.strftime(datetime.today() - timedelta(1), '%-m/%-d/%y')
+    test2 = aus_df.index[-2]
+
+    if aus_df.index[-2] < datetime.strftime(datetime.today() - timedelta(1), '%-m/%-d/%y'):
+        aus_df.rename({aus_df.index[-1]: datetime.strftime(datetime.today() - timedelta(1), '%-m/%-d/%y')}, inplace=True)
+        aus_df.index = pd.to_datetime(aus_df.index)
+    else: 
+        aus_df.rename({aus_df.index[-1]: datetime.today()}, inplace=True)
+        aus_df.index = pd.to_datetime(aus_df.index)
 
     #Reset the index
     aus_df = aus_df.reset_index()
