@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import datetime
 
 app = Flask(__name__)
 
@@ -14,11 +15,17 @@ def plotView():
     plt.switch_backend('Agg')
 
     url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
+    cc_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/web-data/data/cases_country.csv'
 
     df = pd.read_csv(url)
-    
+    dfc = pd.read_csv(cc_url)
+
     #Filter by Australia
     aus_df = df.loc[(df['Country/Region'] == 'Australia')]
+
+    aus_dfc = dfc.loc[(dfc['Country_Region'] == 'Australia')]
+    aus_dfc = aus_dfc.drop(['Lat','Long_', 'Last_Update', 'People_Tested', 'People_Hospitalized', 'Mortality_Rate', 'UID', 'ISO3', 'Deaths', 'Recovered', 'Active', 'Incident_Rate'], axis=1)
+    aus_dfc.rename(columns={'Country_Region':'Country/Region'}, inplace=True)
 
     #Sum all states
     aus_df = aus_df.groupby(['Country/Region']).sum()
@@ -26,19 +33,26 @@ def plotView():
     #Remove Lat and Long columns
     aus_df.drop(['Lat','Long'], axis=1, inplace=True)
 
+    aus_df = pd.merge(aus_df, aus_dfc, on='Country/Region')
+    aus_df = aus_df.groupby(['Country/Region']).sum()
+
     #Show the difference between days (new cases)
     #aus_df = aus_df.diff(axis=1)
 
     #Transpose data (days as rows instead of columns)
     aus_df = aus_df.T
 
+    #Show the difference between days (new cases)
     aus_df['New Cases'] = aus_df['Australia'] - aus_df['Australia'].shift(1)
+
+    aus_df.rename({aus_df.index[-1]: datetime.date.today()}, inplace=True)
+    aus_df.index = pd.to_datetime(aus_df.index)
 
     #Reset the index
     aus_df = aus_df.reset_index()
 
+    #Rename the Date column
     aus_df.rename(columns={'index':'Date'}, inplace=True)
-
 
     #Convert from string to datetime
     aus_df['Date'] = pd.to_datetime(aus_df['Date'])
@@ -49,7 +63,7 @@ def plotView():
     #Format date
     aus_df['Date'] = aus_df['Date'].dt.strftime('%d/%m')
 
-
+    #Prepare for secondary Y axis
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
     # Add traces
@@ -65,7 +79,7 @@ def plotView():
 
     # Add figure title
     fig.update_layout(
-    title_text="New and Overall Cases in Australia"
+    title_text="New and Overall Cases in Australia (data from Johns Hopkins, data now refreshes hourly)"
     )
 
     # Set x-axis title
@@ -88,11 +102,11 @@ def plotView():
     #     )
     # )
 
+    fig.layout.template = 'plotly_white'
     fig.write_html("./templates/file.html")
     # fig.write_html("./index.html")
 
 
-   
     return render_template('file.html') #, url ='/static/images/aus_new.png')
 
 if __name__ == '__main__':
