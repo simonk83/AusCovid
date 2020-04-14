@@ -102,8 +102,7 @@ def plotView():
 
     # Set y-axes titles
     fig.update_yaxes(title_text="New Cases", secondary_y=False)
-    fig.update_yaxes(title_text="Total Cases", secondary_y=True)
-
+    fig.update_yaxes(title_text="Total Cases", secondary_y=True, rangemode = 'tozero')
     # fig.update_xaxes(
     # rangeslider_visible=True,
     #     rangeselector=dict(
@@ -118,6 +117,7 @@ def plotView():
     # )
 
     fig.layout.template = 'plotly_white'
+
     fig.write_html("./templates/file.html")
     # fig.write_html("./index.html")
 
